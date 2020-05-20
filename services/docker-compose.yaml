@@ -61,7 +61,10 @@ services:
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
       - connectionStrings__DbType=${GS_COMMON_DB_TYPE:-postgresql}
       - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
-      - connectionStrings__redis=${GS_REDIS_CONNECTION_STRING:-redis://gs-redis:6379?db=1&maxReadPoolSize=25&maxWritePoolSize=25}
+      - RedisCacheOptions__ConnectionString=${GS_REDIS_CONNECTION_STRING:-gs-redis:6379,defaultDatabase=1}
+      - RedisCacheOptions__ConnectAttempts=${GS_REDIS_CONNECT_ATTEMPTS:-5}
+      - RedisCacheOptions__ReconnectInterval=${GS_REDIS_RECONNECT_INTERVAL:-0.00:00:05}
+      - RedisCacheOptions__DefaultExpiration=${GS_REDIS_DEFAULT_EXPIRATION:-0.02:00:00}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
     ports:
       - "${WEB_API_PORT}:80"
@@ -217,7 +220,10 @@ services:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
       - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
-      - connectionStrings__redis=${GS_REDIS_CONNECTION_STRING:-redis://gs-redis:6379?db=1&maxReadPoolSize=25&maxWritePoolSize=25}
+      - RedisCacheOptions__ConnectionString=${GS_REDIS_CONNECTION_STRING:-gs-redis:6379,defaultDatabase=1}
+      - RedisCacheOptions__ConnectAttempts=${GS_REDIS_CONNECT_ATTEMPTS:-5}
+      - RedisCacheOptions__ReconnectInterval=${GS_REDIS_RECONNECT_INTERVAL:-0.00:00:05}
+      - RedisCacheOptions__DefaultExpiration=${GS_REDIS_DEFAULT_EXPIRATION:-0.02:00:00}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_TASK:-gs-single-task}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_INBOX:-gs-single-inbox}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}

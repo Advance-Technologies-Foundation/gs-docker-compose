@@ -75,7 +75,10 @@ services:
       - connectionStrings__db=${GS_DB_CONNECTION_STRING}
       - connectionStrings__DbType=${GS_COMMON_DB_TYPE}
       - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP}
-      - connectionStrings__redis=${GS_REDIS_CONNECTION_STRING}
+      - RedisCacheOptions__ConnectionString=${GS_REDIS_CONNECTION_STRING}
+      - RedisCacheOptions__ConnectAttempts=${GS_REDIS_CONNECT_ATTEMPTS:-5}
+      - RedisCacheOptions__ReconnectInterval=${GS_REDIS_RECONNECT_INTERVAL:-0.00:00:05}
+      - RedisCacheOptions__DefaultExpiration=${GS_REDIS_DEFAULT_EXPIRATION:-0.02:00:00}
       - Log4NetPath=log4net.production.config
     ports:
       - "1024:80"
@@ -258,7 +261,10 @@ services:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING}
       - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP}
-      - connectionStrings__redis=${GS_REDIS_CONNECTION_STRING}
+      - RedisCacheOptions__ConnectionString=${GS_REDIS_CONNECTION_STRING}
+      - RedisCacheOptions__ConnectAttempts=${GS_REDIS_CONNECT_ATTEMPTS:-5}
+      - RedisCacheOptions__ReconnectInterval=${GS_REDIS_RECONNECT_INTERVAL:-0.00:00:05}
+      - RedisCacheOptions__DefaultExpiration=${GS_REDIS_DEFAULT_EXPIRATION:-0.02:00:00}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_TASK}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_INBOX}
       - Log4NetPath=log4net.production.config
