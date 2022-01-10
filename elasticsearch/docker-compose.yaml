@@ -1,7 +1,7 @@
 version: '3'
 services:
   es01:
-    image: bpmonline/elasticsearch:5.6.9
+    image: elasticsearch:7.16.2
     container_name: es-01
     environment:
       - cluster.name=es-cluster
@@ -11,6 +11,7 @@ services:
       - xpack.graph.enabled=false
       - xpack.watcher.enabled=false
       - ES_JAVA_OPTS=${ES_JAVA_OPTS}
+      - discovery.type=single-node
     ulimits:
       memlock:
         soft: -1
