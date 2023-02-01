@@ -54,7 +54,7 @@ services:
 
   web-api:
     container_name: gs-web-api
-    image: ${DOCKER_LOGIN:-bpmonline}/gs-web-api:${DOCKER_TAG:-3.0.21}
+    image: ${DOCKER_LOGIN:-bpmonline}/gs-web-api:${DOCKER_TAG:-3.0.23}
     environment:
       - RequestTimeOut=${GS_REQUEST_TIMEOUT:-600000}
       - elasticLogin=${GS_ES_LOGIN}
@@ -83,7 +83,7 @@ services:
 
   web-indexing-service:
     container_name: gs-web-indexing-service
-    image: ${DOCKER_LOGIN:-bpmonline}/gs-web-indexing-service:${DOCKER_TAG:-3.0.21}
+    image: ${DOCKER_LOGIN:-bpmonline}/gs-web-indexing-service:${DOCKER_TAG:-3.0.23}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -107,14 +107,14 @@ services:
 
   search-service:
     container_name: gs-search-service
-    image: ${DOCKER_LOGIN:-bpmonline}/gs-search-service:${DOCKER_TAG:-3.0.21}
+    image: ${DOCKER_LOGIN:-bpmonline}/gs-search-service:${DOCKER_TAG:-3.0.23}
     environment:
       - ElasticSearch__Url=${GS_ES_URL}
       - ElasticSearch__Login=${GS_ES_LOGIN}
       - ElasticSearch__Password=${GS_ES_PASSWORD}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
-      - AuthenticationOptions__UseOAuth=false
-      - WebAppUrl=http://web-api
+      - AuthenticationOptions__UseOAuth=true
+      - WebAppUrl=http://${CURRENT_SERVER_IP}:${WEB_API_PORT}
     ports:
       - "${SEARCH_SERVICE_PORT}:8080"
     restart: unless-stopped
@@ -127,7 +127,7 @@ services:
 
   scheduler:
     container_name: gs-scheduler
-    image: ${DOCKER_LOGIN:-bpmonline}/gs-scheduler:${DOCKER_TAG:-3.0.21}
+    image: ${DOCKER_LOGIN:-bpmonline}/gs-scheduler:${DOCKER_TAG:-3.0.23}
     environment:
       - DbType=${GS_COMMON_DB_TYPE:-postgresql}
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
@@ -147,7 +147,7 @@ services:
 
   worker:
     container_name: gs-worker-01
-    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker:${DOCKER_TAG:-3.0.21}
+    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker:${DOCKER_TAG:-3.0.23}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -170,7 +170,7 @@ services:
 
   worker-queried-single-task:
     container_name: gs-worker-queried-single-task
-    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker-queried-single-task:${DOCKER_TAG:-3.0.21}
+    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker-queried-single-task:${DOCKER_TAG:-3.0.23}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -194,7 +194,7 @@ services:
 
   worker-replay:
     container_name: gs-worker-replay
-    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker-replay:${DOCKER_TAG:-3.0.21}
+    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker-replay:${DOCKER_TAG:-3.0.23}
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
@@ -212,7 +212,7 @@ services:
 
   worker-single:
     container_name: gs-worker-single
-    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker-single:${DOCKER_TAG:-3.0.21}
+    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker-single:${DOCKER_TAG:-3.0.23}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -233,7 +233,7 @@ services:
 
   worker-single-replay:
     container_name: gs-worker-single-replay
-    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker-single-replay:${DOCKER_TAG:-3.0.21}
+    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker-single-replay:${DOCKER_TAG:-3.0.23}
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
@@ -252,7 +252,7 @@ services:
 
   worker-single-task:
     container_name: gs-worker-single-task
-    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker-single-task:${DOCKER_TAG:-3.0.21}
+    image: ${DOCKER_LOGIN:-bpmonline}/gs-worker-single-task:${DOCKER_TAG:-3.0.23}
     environment:
       - DbType=${GS_COMMON_DB_TYPE:-postgresql}
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
