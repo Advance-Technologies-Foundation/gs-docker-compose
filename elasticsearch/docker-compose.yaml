@@ -1,7 +1,7 @@
 version: '3'
 services:
   es01:
-    image: elasticsearch:7.16.2
+    image: elasticsearch:7.17.9
     container_name: es-01
     environment:
       - cluster.name=es-cluster
