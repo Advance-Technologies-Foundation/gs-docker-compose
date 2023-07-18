@@ -57,12 +57,14 @@ services:
 
   web-api:
     container_name: gs-web-api
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-api:${DOCKER_TAG:-3.0.39}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-api:${DOCKER_TAG:-4.0.0}
     environment:
       - RequestTimeOut=${GS_REQUEST_TIMEOUT:-600000}
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
       - elasticSearchUrl=${GS_ES_URL}
+      - workerThreads=${GS_WEBAPI_WORKER_THREADS:-200}
+      - completionPortThreads=${GS_WEBAPI_COMPLETION_PORT_THREADS:-200}
       - searchServiceUrl=http://${CURRENT_SERVER_IP}:${SEARCH_SERVICE_PORT}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
       - connectionStrings__DbType=${GS_COMMON_DB_TYPE:-postgresql}
@@ -86,7 +88,7 @@ services:
 
   web-indexing-service:
     container_name: gs-web-indexing-service
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-indexing-service:${DOCKER_TAG:-3.0.39}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-indexing-service:${DOCKER_TAG:-4.0.0}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -95,9 +97,18 @@ services:
       - RabbitConfiguration__ConnectAttempts=${RABBITMQ_CONNECT_ATTEMPTS:-5}
       - RabbitConfiguration__ReconnectInterval=${RABBITMQ_RECONNECT_INTERVAL:-00:00:05}
       - RabbitConfiguration__NetworkRecoveryInterval=${RABBITMQ_NETWORK_RECOVERY_INTERVAL:-00:00:05}
+      - RabbitConfiguration__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - IndexEntityPublisherConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_TASK:-gs-single-task}
       - QueriedIndexEntityPublisherConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_QUERIED_TASK_INBOX:-gs-single-queried-task-inbox}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
+      - PublisherPriority__HighPrioritySilencePeriodSec=${PUBLISHER_HIGH_PRIORITY_SILENCE_PERIOD_SEC:-30}
+      - PublisherPriority__HighPriorityMaxEntitiesPerSilencePeriod=${PUBLISHER_HIGH_PRIORITY_MAX_ENTITIES_PER_SILENCE_PERIOD:-5}
+      - RedisCacheOptions__ConnectionString=${GS_REDIS_CONNECTION_STRING:-gs-redis:6379,defaultDatabase=1}
+      - RedisCacheOptions__ConnectAttempts=${GS_REDIS_CONNECT_ATTEMPTS:-5}
+      - RedisCacheOptions__ReconnectInterval=${GS_REDIS_RECONNECT_INTERVAL:-0.00:00:05}
+      - RedisCacheOptions__DefaultExpiration=${GS_REDIS_DEFAULT_EXPIRATION:-0.02:00:00}
+      - workerThreads=${GS_INDEXING_SERVICE_WORKER_THREADS:-200}
+      - completionPortThreads=${GS_INDEXING_SERVICE_COMPLETION_PORT_THREADS:-200}
     ports:
       - "${WEB_INDEXING_SERVICE_PORT}:8080"
     restart: unless-stopped
@@ -110,7 +121,7 @@ services:
 
   search-service:
     container_name: gs-search-service
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-search-service:${DOCKER_TAG:-3.0.39}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-search-service:${DOCKER_TAG:-4.0.0}
     environment:
       - ElasticSearch__Url=${GS_ES_URL}
       - ElasticSearch__Login=${GS_ES_LOGIN}
@@ -131,7 +142,7 @@ services:
 
   scheduler:
     container_name: gs-scheduler
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-scheduler:${DOCKER_TAG:-3.0.39}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-scheduler:${DOCKER_TAG:-4.0.0}
     environment:
       - DbType=${GS_COMMON_DB_TYPE:-postgresql}
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
@@ -140,6 +151,7 @@ services:
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_INBOX:-gs-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_OUTBOX:-gs-outbox}
       - RabbitMQSettings__FillQueueInterval=${GS_DB_FILL_QUEUE_INTERVAL:-30000}
+      - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
     restart: unless-stopped
     networks:
@@ -151,7 +163,7 @@ services:
 
   worker:
     container_name: gs-worker-01
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker:${DOCKER_TAG:-3.0.39}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker:${DOCKER_TAG:-4.0.0}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -163,6 +175,7 @@ services:
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_INBOX:-gs-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_OUTBOX:-gs-outbox}
       - RabbitMQSettings__IncrementDays=${GS_DB_INCREMENT_DAYS:-500}
+      - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
       - TraceDebugInfo=${TraceDebugInfo:-false}
     restart: unless-stopped
@@ -175,7 +188,7 @@ services:
 
   worker-queried-single-task:
     container_name: gs-worker-queried-single-task
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-queried-single-task:${DOCKER_TAG:-3.0.39}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-queried-single-task:${DOCKER_TAG:-4.0.0}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -184,6 +197,7 @@ services:
       - RabbitConfiguration__ConnectAttempts=${RABBITMQ_CONNECT_ATTEMPTS:-5}
       - RabbitConfiguration__ReconnectInterval=${RABBITMQ_RECONNECT_INTERVAL:-00:00:05}
       - RabbitConfiguration__NetworkRecoveryInterval=${RABBITMQ_NETWORK_RECOVERY_INTERVAL:-00:00:05}
+      - RabbitConfiguration__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - IndexEntityPublisherConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_TASK:-gs-single-task}
       - RabbitConsumerConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_QUERIED_TASK_INBOX:-gs-single-queried-task-inbox}
       - ElasticScrollConfiguration__ScrollBatchSize=${ES_SCROLL_BATCH_SIZE:-1000}
@@ -199,13 +213,14 @@ services:
 
   worker-replay:
     container_name: gs-worker-replay
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-replay:${DOCKER_TAG:-3.0.39}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-replay:${DOCKER_TAG:-4.0.0}
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
       - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_INBOX:-gs-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_OUTBOX:-gs-outbox}
+      - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
     restart: unless-stopped
     networks:
@@ -217,7 +232,7 @@ services:
 
   worker-single:
     container_name: gs-worker-single
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single:${DOCKER_TAG:-3.0.39}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single:${DOCKER_TAG:-4.0.0}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -227,6 +242,7 @@ services:
       - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_INBOX:-gs-single-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_OUTBOX:-gs-single-outbox}
+      - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
       - TraceDebugInfo=${TraceDebugInfo:-false}
     restart: unless-stopped
@@ -239,7 +255,7 @@ services:
 
   worker-single-replay:
     container_name: gs-worker-single-replay
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-replay:${DOCKER_TAG:-3.0.39}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-replay:${DOCKER_TAG:-4.0.0}
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
@@ -247,6 +263,7 @@ services:
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_INBOX:-gs-single-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_OUTBOX:-gs-single-outbox}
       - RabbitMQSettings__IncrementDays=${GS_DB_INCREMENT_DAYS:-500}
+      - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
     restart: unless-stopped
     networks:
@@ -258,7 +275,7 @@ services:
 
   worker-single-task:
     container_name: gs-worker-single-task
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-task:${DOCKER_TAG:-3.0.39}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-task:${DOCKER_TAG:-4.0.0}
     environment:
       - DbType=${GS_COMMON_DB_TYPE:-postgresql}
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
@@ -270,6 +287,7 @@ services:
       - RedisCacheOptions__DefaultExpiration=${GS_REDIS_DEFAULT_EXPIRATION:-0.02:00:00}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_TASK:-gs-single-task}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_INBOX:-gs-single-inbox}
+      - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
     restart: unless-stopped
     networks:
