@@ -126,7 +126,7 @@ services:
       - ElasticSearch__Url=${GS_ES_URL}
       - ElasticSearch__Login=${GS_ES_LOGIN}
       - ElasticSearch__Password=${GS_ES_PASSWORD}
-      - ElasticSearch__TraceDebugInfo=${GS_ES_TRACEDEBUGINFO:-false}
+      - ElasticSearch__TraceDebugInfo=${GS_ES_TRACE_DEBUG_INFO:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
       - AuthenticationOptions__UseOAuth=false
       - WebAppUrl=http://gs-web-api:8080
@@ -177,7 +177,7 @@ services:
       - RabbitMQSettings__IncrementDays=${GS_DB_INCREMENT_DAYS:-500}
       - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
-      - TraceDebugInfo=${TraceDebugInfo:-false}
+      - TraceDebugInfo=${GS_ES_TRACE_DEBUG_INFO:-false}
     restart: unless-stopped
     networks:
       - gs-network
@@ -244,7 +244,7 @@ services:
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_OUTBOX:-gs-single-outbox}
       - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
-      - TraceDebugInfo=${TraceDebugInfo:-false}
+      - TraceDebugInfo=${GS_ES_TRACE_DEBUG_INFO:-false}
     restart: unless-stopped
     networks:
       - gs-network
