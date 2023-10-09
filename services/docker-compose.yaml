@@ -57,7 +57,7 @@ services:
 
   web-api:
     container_name: gs-web-api
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-api:${DOCKER_TAG:-4.0.0}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-api:${DOCKER_TAG:-4.0.14}
     environment:
       - RequestTimeOut=${GS_REQUEST_TIMEOUT:-600000}
       - elasticLogin=${GS_ES_LOGIN}
@@ -88,7 +88,7 @@ services:
 
   web-indexing-service:
     container_name: gs-web-indexing-service
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-indexing-service:${DOCKER_TAG:-4.0.0}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-indexing-service:${DOCKER_TAG:-4.0.14}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -99,7 +99,9 @@ services:
       - RabbitConfiguration__NetworkRecoveryInterval=${RABBITMQ_NETWORK_RECOVERY_INTERVAL:-00:00:05}
       - RabbitConfiguration__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - IndexEntityPublisherConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_TASK:-gs-single-task}
+      - IndexEntityPublisherConfiguration__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - QueriedIndexEntityPublisherConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_QUERIED_TASK_INBOX:-gs-single-queried-task-inbox}
+      - QueriedIndexEntityPublisherConfiguration__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
       - PublisherPriority__HighPrioritySilencePeriodSec=${PUBLISHER_HIGH_PRIORITY_SILENCE_PERIOD_SEC:-30}
       - PublisherPriority__HighPriorityMaxEntitiesPerSilencePeriod=${PUBLISHER_HIGH_PRIORITY_MAX_ENTITIES_PER_SILENCE_PERIOD:-5}
@@ -121,7 +123,7 @@ services:
 
   search-service:
     container_name: gs-search-service
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-search-service:${DOCKER_TAG:-4.0.0}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-search-service:${DOCKER_TAG:-4.0.14}
     environment:
       - ElasticSearch__Url=${GS_ES_URL}
       - ElasticSearch__Login=${GS_ES_LOGIN}
@@ -142,7 +144,7 @@ services:
 
   scheduler:
     container_name: gs-scheduler
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-scheduler:${DOCKER_TAG:-4.0.0}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-scheduler:${DOCKER_TAG:-4.0.14}
     environment:
       - DbType=${GS_COMMON_DB_TYPE:-postgresql}
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
@@ -163,7 +165,7 @@ services:
 
   worker:
     container_name: gs-worker-01
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker:${DOCKER_TAG:-4.0.0}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker:${DOCKER_TAG:-4.0.14}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -188,7 +190,7 @@ services:
 
   worker-queried-single-task:
     container_name: gs-worker-queried-single-task
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-queried-single-task:${DOCKER_TAG:-4.0.0}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-queried-single-task:${DOCKER_TAG:-4.0.14}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -213,7 +215,7 @@ services:
 
   worker-replay:
     container_name: gs-worker-replay
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-replay:${DOCKER_TAG:-4.0.0}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-replay:${DOCKER_TAG:-4.0.14}
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
@@ -232,7 +234,7 @@ services:
 
   worker-single:
     container_name: gs-worker-single
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single:${DOCKER_TAG:-4.0.0}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single:${DOCKER_TAG:-4.0.14}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -255,7 +257,7 @@ services:
 
   worker-single-replay:
     container_name: gs-worker-single-replay
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-replay:${DOCKER_TAG:-4.0.0}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-replay:${DOCKER_TAG:-4.0.14}
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
@@ -275,7 +277,7 @@ services:
 
   worker-single-task:
     container_name: gs-worker-single-task
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-task:${DOCKER_TAG:-4.0.0}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-task:${DOCKER_TAG:-4.0.14}
     environment:
       - DbType=${GS_COMMON_DB_TYPE:-postgresql}
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
