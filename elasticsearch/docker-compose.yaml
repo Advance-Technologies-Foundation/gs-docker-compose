@@ -22,6 +22,11 @@ services:
       - 9200:9200
     networks:
       - elasticsearch
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "5"
 volumes:
   es:
     driver: local
