@@ -14,7 +14,7 @@ services:
 
   postgres:
     container_name: gs-postgres
-    image: "postgres:11"
+    image: postgres:11
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -22,8 +22,8 @@ services:
     restart: unless-stopped
     volumes:
       - postgres:/data/postgres
-    ports:
-      - "${POSTGRES_PORT:-50432}:5432"
+    #    ports:
+    #      - "${POSTGRES_PORT:-50432}:5432"
     networks:
       - gs-network
     logging:
@@ -31,19 +31,24 @@ services:
       options:
         max-size: "5m"
         max-file: "5"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   rabbitmq:
     container_name: gs-rabbitmq
-    image: "rabbitmq:3.13.0-management"
+    image: rabbitmq:3.13.1-management
     environment:
       - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
       - RABBITMQ_DEFAULT_USER=gs
       - RABBITMQ_DEFAULT_PASS=gs
       - RABBITMQ_DEFAULT_VHOST=/
-    ports:
-      - "${RABBIT_PORT:-50672}:5672"
-      - "5673:5673"
-      - "15672:15672"
+    #    ports:
+    #      - "${RABBIT_PORT:-50672}:5672"
+    #      - "5673:5673"
+    #      - "15672:15672"
     restart: unless-stopped
     volumes:
       - "rabbitmq:/var/lib/rabbitmq"
@@ -54,10 +59,15 @@ services:
       options:
         max-size: "5m"
         max-file: "5"
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   redis:
     container_name: gs-redis
-    image: 'bitnami/redis:5.0'
+    image: bitnami/redis:7.0.8
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
@@ -71,10 +81,15 @@ services:
       options:
         max-size: "5m"
         max-file: "5"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   web-api:
     container_name: gs-web-api
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-api:${DOCKER_TAG:-5.0.24}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-api:${DOCKER_TAG:-6.0.11}
     environment:
       - RequestTimeOut=${GS_REQUEST_TIMEOUT:-600000}
       - elasticLogin=${GS_ES_LOGIN}
@@ -93,24 +108,33 @@ services:
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
       - IgnoredEntities=${IGNORED_ENTITIES:-VwSysProcessLog,SysPrcHistoryLog,MLModel,MLModelFile,SysSettings,VwWebServiceV2}
       - AuthenticationOptions__UseOAuth=false
+      - CircuitBreaker__Enable=false
     ports:
       - "${WEB_API_PORT}:8080"
     restart: unless-stopped
     networks:
       - gs-network
     depends_on:
-      - redis
-      - postgres
-      - rabbitmq
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
         max-size: "5m"
         max-file: "5"
+    healthcheck:
+      test: ["CMD", "/usr/bin/curl", "-fsSL", "http://127.0.0.1:8080/readiness"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
 
   web-indexing-service:
     container_name: gs-web-indexing-service
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-indexing-service:${DOCKER_TAG:-5.0.24}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-web-indexing-service:${DOCKER_TAG:-6.0.11}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -139,18 +163,26 @@ services:
     networks:
       - gs-network
     depends_on:
-      - redis
-      - postgres
-      - rabbitmq
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
         max-size: "5m"
         max-file: "5"
+    healthcheck:
+      test: ["CMD", "/usr/bin/curl", "-fsSL", "http://127.0.0.1:8080/readiness"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
 
   search-service:
     container_name: gs-search-service
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-search-service:${DOCKER_TAG:-5.0.24}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-search-service:${DOCKER_TAG:-6.0.11}
     environment:
       - ElasticSearch__Url=${GS_ES_URL}
       - ElasticSearch__Login=${GS_ES_LOGIN}
@@ -165,18 +197,26 @@ services:
     networks:
       - gs-network
     depends_on:
-      - redis
-      - postgres
-      - rabbitmq
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
         max-size: "5m"
         max-file: "5"
+    healthcheck:
+      test: ["CMD", "/usr/bin/curl", "-fsSL", "http://127.0.0.1:8080/readiness"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
 
   scheduler:
     container_name: gs-scheduler
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-scheduler:${DOCKER_TAG:-5.0.24}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-scheduler:${DOCKER_TAG:-6.0.11}
     environment:
       - DbType=${GS_COMMON_DB_TYPE:-postgresql}
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
@@ -185,15 +225,21 @@ services:
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_INBOX:-gs-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_OUTBOX:-gs-outbox}
       - RabbitMQSettings__FillQueueInterval=${GS_DB_FILL_QUEUE_INTERVAL:-30000}
+      - RabbitMQSettings__IncrementDays=${GS_DB_INCREMENT_DAYS:-500}
       - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
+      - CircuitBreaker__Enable=false
+      - RedisCacheOptions__ConnectionString=redis:6379
     restart: unless-stopped
     networks:
       - gs-network
     depends_on:
-      - redis
-      - postgres
-      - rabbitmq
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
@@ -202,12 +248,13 @@ services:
 
   worker:
     container_name: gs-worker-01
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker:${DOCKER_TAG:-5.0.24}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker:${DOCKER_TAG:-6.0.11}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
       - RequestTimeOut=${GS_REQUEST_TIMEOUT:-600000}
       - IndexingContentLength=${GS_INDEXING_CONTENT_LENGTH:-500}
+      - MaxIndexingPagesCount=100
       - OnSiteClientSettings__ElasticSearchUrl=${GS_ES_URL}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
       - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
@@ -217,13 +264,18 @@ services:
       - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
       - TraceDebugInfo=${GS_ES_TRACE_DEBUG_INFO:-false}
+      - CircuitBreaker__Enable=false
+      - RedisCacheOptions__ConnectionString=redis:6379
     restart: unless-stopped
     networks:
       - gs-network
     depends_on:
-      - redis
-      - postgres
-      - rabbitmq
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
@@ -232,7 +284,7 @@ services:
 
   worker-queried-single-task:
     container_name: gs-worker-queried-single-task
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-queried-single-task:${DOCKER_TAG:-5.0.24}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-queried-single-task:${DOCKER_TAG:-6.0.11}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -244,16 +296,19 @@ services:
       - RabbitConfiguration__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - IndexEntityPublisherConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_TASK:-gs-single-task}
       - RabbitConsumerConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_QUERIED_TASK_INBOX:-gs-single-queried-task-inbox}
-      - ElasticScrollConfiguration__ScrollBatchSize=${ES_SCROLL_BATCH_SIZE:-1000}
+      - ElasticScrollConfiguration__ScrollBatchSize=${ES_SCROLL_BATCH_SIZE:-0}
       - ElasticScrollConfiguration__ScrollTimeout=${ES_SCROLL_TIMEOUT:-60000}
       - Log4NetPath=l${LOG4NET_CONFIG_FILE:-log4net.production.config}
     restart: unless-stopped
     networks:
       - gs-network
     depends_on:
-      - redis
-      - postgres
-      - rabbitmq
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
@@ -262,7 +317,7 @@ services:
 
   worker-replay:
     container_name: gs-worker-replay
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-replay:${DOCKER_TAG:-5.0.24}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-replay:${DOCKER_TAG:-6.0.11}
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
@@ -275,9 +330,12 @@ services:
     networks:
       - gs-network
     depends_on:
-      - redis
-      - postgres
-      - rabbitmq
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
@@ -286,7 +344,7 @@ services:
 
   worker-single:
     container_name: gs-worker-single
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single:${DOCKER_TAG:-5.0.24}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single:${DOCKER_TAG:-6.0.11}
     environment:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
@@ -299,13 +357,18 @@ services:
       - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
       - TraceDebugInfo=${GS_ES_TRACE_DEBUG_INFO:-false}
+      - CircuitBreaker__Enable=false
+      - RedisCacheOptions__ConnectionString=redis:6379
     restart: unless-stopped
     networks:
       - gs-network
     depends_on:
-      - redis
-      - postgres
-      - rabbitmq
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
@@ -314,7 +377,7 @@ services:
 
   worker-single-replay:
     container_name: gs-worker-single-replay
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-replay:${DOCKER_TAG:-5.0.24}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-replay:${DOCKER_TAG:-6.0.11}
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
@@ -328,9 +391,12 @@ services:
     networks:
       - gs-network
     depends_on:
-      - redis
-      - postgres
-      - rabbitmq
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
@@ -339,7 +405,7 @@ services:
 
   worker-single-task:
     container_name: gs-worker-single-task
-    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-task:${DOCKER_TAG:-5.0.24}
+    image: ${DOCKER_LOGIN:-registry.creatio.com}/gs-worker-single-task:${DOCKER_TAG:-6.0.11}
     environment:
       - DbType=${GS_COMMON_DB_TYPE:-postgresql}
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
@@ -357,9 +423,12 @@ services:
     networks:
       - gs-network
     depends_on:
-      - redis
-      - postgres
-      - rabbitmq
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:
