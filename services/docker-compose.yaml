@@ -138,11 +138,12 @@ services:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
       - elasticSearchUrl=${GS_ES_URL}
-      - RabbitConfiguration__RabbitMQUri=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
-      - RabbitConfiguration__ConnectAttempts=${RABBITMQ_CONNECT_ATTEMPTS:-5}
-      - RabbitConfiguration__ReconnectInterval=${RABBITMQ_RECONNECT_INTERVAL:-00:00:05}
-      - RabbitConfiguration__NetworkRecoveryInterval=${RABBITMQ_NETWORK_RECOVERY_INTERVAL:-00:00:05}
-      - RabbitConfiguration__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
+      - RabbitMQSettings__ConnectionString=${GS_RABBITMQ_AMQP}
+      - RabbitMQSettings__RabbitMQUri=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
+      - RabbitMQSettings__ConnectAttempts=${RABBITMQ_CONNECT_ATTEMPTS:-5}
+      - RabbitMQSettings__ReconnectInterval=${RABBITMQ_RECONNECT_INTERVAL:-00:00:05}
+      - RabbitMQSettings__NetworkRecoveryInterval=${RABBITMQ_NETWORK_RECOVERY_INTERVAL:-00:00:05}
+      - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - IndexEntityPublisherConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_TASK:-gs-single-task}
       - IndexEntityPublisherConfiguration__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - QueriedIndexEntityPublisherConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_QUERIED_TASK_INBOX:-gs-single-queried-task-inbox}
@@ -221,6 +222,7 @@ services:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
       - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
+      - RabbitMQSettings__ConnectionString=${GS_RABBITMQ_AMQP}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_INBOX:-gs-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_OUTBOX:-gs-outbox}
       - RabbitMQSettings__FillQueueInterval=${GS_DB_FILL_QUEUE_INTERVAL:-30000}
@@ -256,7 +258,7 @@ services:
       - MaxIndexingPagesCount=100
       - OnSiteClientSettings__ElasticSearchUrl=${GS_ES_URL}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
-      - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
+      - RabbitMQSettings__ConnectionString=${GS_RABBITMQ_AMQP}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_INBOX:-gs-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_OUTBOX:-gs-outbox}
       - RabbitMQSettings__IncrementDays=${GS_DB_INCREMENT_DAYS:-500}
@@ -288,11 +290,12 @@ services:
       - elasticLogin=${GS_ES_LOGIN}
       - elasticPassword=${GS_ES_PASSWORD}
       - OnSiteClientSettings__ElasticSearchUrl=${GS_ES_URL}
-      - RabbitConfiguration__RabbitMQUri=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
-      - RabbitConfiguration__ConnectAttempts=${RABBITMQ_CONNECT_ATTEMPTS:-5}
-      - RabbitConfiguration__ReconnectInterval=${RABBITMQ_RECONNECT_INTERVAL:-00:00:05}
-      - RabbitConfiguration__NetworkRecoveryInterval=${RABBITMQ_NETWORK_RECOVERY_INTERVAL:-00:00:05}
-      - RabbitConfiguration__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
+      - RabbitMQSettings__ConnectionString=${GS_RABBITMQ_AMQP}
+      - RabbitMQSettings__RabbitMQUri=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
+      - RabbitMQSettings__ConnectAttempts=${RABBITMQ_CONNECT_ATTEMPTS:-5}
+      - RabbitMQSettings__ReconnectInterval=${RABBITMQ_RECONNECT_INTERVAL:-00:00:05}
+      - RabbitMQSettings__NetworkRecoveryInterval=${RABBITMQ_NETWORK_RECOVERY_INTERVAL:-00:00:05}
+      - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - IndexEntityPublisherConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_TASK:-gs-single-task}
       - RabbitConsumerConfiguration__QueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_QUERIED_TASK_INBOX:-gs-single-queried-task-inbox}
       - ElasticScrollConfiguration__ScrollBatchSize=${ES_SCROLL_BATCH_SIZE:-0}
@@ -320,7 +323,7 @@ services:
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
-      - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
+      - RabbitMQSettings__ConnectionString=${GS_RABBITMQ_AMQP}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_INBOX:-gs-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_OUTBOX:-gs-outbox}
       - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
@@ -350,7 +353,7 @@ services:
       - RequestTimeOut=${GS_REQUEST_TIMEOUT:-600000}
       - IndexingContentLength=${GS_INDEXING_CONTENT_LENGTH:-500}
       - OnSiteClientSettings__ElasticSearchUrl=${GS_ES_URL}
-      - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
+      - RabbitMQSettings__ConnectionString=${GS_RABBITMQ_AMQP}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_INBOX:-gs-single-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_OUTBOX:-gs-single-outbox}
       - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
@@ -380,7 +383,7 @@ services:
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
-      - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
+      - RabbitMQSettings__ConnectionString=${GS_RABBITMQ_AMQP}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_INBOX:-gs-single-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_OUTBOX:-gs-single-outbox}
       - RabbitMQSettings__IncrementDays=${GS_DB_INCREMENT_DAYS:-500}
@@ -409,11 +412,11 @@ services:
       - DbType=${GS_COMMON_DB_TYPE:-postgresql}
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
-      - connectionStrings__RabbitMQ=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
       - RedisCacheOptions__ConnectionString=${GS_REDIS_CONNECTION_STRING:-gs-redis:6379,defaultDatabase=1}
       - RedisCacheOptions__ConnectAttempts=${GS_REDIS_CONNECT_ATTEMPTS:-5}
       - RedisCacheOptions__ReconnectInterval=${GS_REDIS_RECONNECT_INTERVAL:-0.00:00:05}
       - RedisCacheOptions__DefaultExpiration=${GS_REDIS_DEFAULT_EXPIRATION:-0.02:00:00}
+      - RabbitMQSettings__ConnectionString=${GS_RABBITMQ_AMQP}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_TASK:-gs-single-task}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_INBOX:-gs-single-inbox}
       - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
