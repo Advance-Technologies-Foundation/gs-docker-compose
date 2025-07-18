@@ -107,7 +107,7 @@ services:
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
       - IgnoredEntities=${IGNORED_ENTITIES:-VwSysProcessLog,SysPrcHistoryLog,MLModel,MLModelFile,SysSettings,VwWebServiceV2}
       - AuthenticationOptions__UseOAuth=false
-      - CircuitBreaker__Enable=false
+      - CircuitBreaker__Enable=true
     ports:
       - "${WEB_API_PORT}:8080"
     restart: unless-stopped
@@ -229,7 +229,7 @@ services:
       - RabbitMQSettings__IncrementDays=${GS_DB_INCREMENT_DAYS:-500}
       - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
-      - CircuitBreaker__Enable=false
+      - CircuitBreaker__Enable=true
       - RedisCacheOptions__ConnectionString=redis:6379
     restart: unless-stopped
     networks:
@@ -265,7 +265,7 @@ services:
       - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
       - TraceDebugInfo=${GS_ES_TRACE_DEBUG_INFO:-false}
-      - CircuitBreaker__Enable=false
+      - CircuitBreaker__Enable=true
       - RedisCacheOptions__ConnectionString=redis:6379
     restart: unless-stopped
     networks:
@@ -359,7 +359,7 @@ services:
       - RabbitMQSettings__QueuePriorityEnable=${QUEUE_PRIORITY_ENABLE:-false}
       - Log4NetPath=${LOG4NET_CONFIG_FILE:-log4net.production.config}
       - TraceDebugInfo=${GS_ES_TRACE_DEBUG_INFO:-false}
-      - CircuitBreaker__Enable=false
+      - CircuitBreaker__Enable=true
       - RedisCacheOptions__ConnectionString=redis:6379
     restart: unless-stopped
     networks:
