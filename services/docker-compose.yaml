@@ -336,6 +336,7 @@ services:
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
+      - OnSiteClientSettings__ElasticSearchUrl=${GS_ES_URL}
       - RabbitMQSettings__ConnectionString=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_INBOX:-gs-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_OUTBOX:-gs-outbox}
@@ -400,6 +401,7 @@ services:
     environment:
       - DbDialectProvider=${GS_COMMON_DB_DIALECT_PROVIDER:-ServiceStack.OrmLite.PostgreSqlDialect, ServiceStack.OrmLite.PostgreSQL, Culture=neutral, PublicKeyToken=null}
       - connectionStrings__db=${GS_DB_CONNECTION_STRING:-User ID=postgres;Password=postgres;Server=gs-postgres;Port=5432;Database=postgres;Pooling=true;MinPoolSize=0;MaxPoolSize=200}
+      - OnSiteClientSettings__ElasticSearchUrl=${GS_ES_URL}
       - RabbitMQSettings__ConnectionString=${GS_RABBITMQ_AMQP:-amqp://gs:gs@gs-rabbitmq:5672}
       - RabbitMQSettings__RabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_INBOX:-gs-single-inbox}
       - RabbitMQSettings__ReplyRabbitQueueName=${GS_RABBITMQ_QUEUE_NAME_SINGLE_OUTBOX:-gs-single-outbox}
