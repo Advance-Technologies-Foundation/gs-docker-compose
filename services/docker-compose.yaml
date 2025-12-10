@@ -70,7 +70,7 @@ services:
 
   redis:
     container_name: gs-redis
-    image: bitnami/redis:7.0.8
+    image: bitnamilegacy/redis:8.2.1
     labels:
       - service=gs
     environment:
@@ -457,3 +457,4 @@ services:
       options:
         max-size: "5m"
         max-file: "5"
+
